@@ -17,7 +17,7 @@ endif
 LOCAL_PATH := $(BUILD_SYSTEM)
 
 # Pick a reasonable string to use to identify files.
-ifneq ($(LIQUID_BUILD),)
+ifneq ($(INFAMOUS_BUILD),)
 ifneq "" "$(filter eng.%,$(BUILD_NUMBER))"
   # BUILD_NUMBER has a timestamp in it, which means that
   # it will change every time.  Pick a stable value.
@@ -211,7 +211,7 @@ endif
 	$(hide) TARGET_BUILD_TYPE="$(TARGET_BUILD_VARIANT)" \
 			TARGET_BUILD_FLAVOR="$(TARGET_PRODUCT)-$(TARGET_BUILD_VARIANT)" \
 			TARGET_DEVICE="$(TARGET_DEVICE)" \
-			LIQUID_DEVICE="$(TARGET_DEVICE)" \
+			INFAMOUS_DEVICE="$(TARGET_DEVICE)" \
 			PRODUCT_NAME="$(TARGET_PRODUCT)" \
 			PRODUCT_BRAND="$(PRODUCT_BRAND)" \
 			PRODUCT_DEFAULT_LANGUAGE="$(call default-locale-language,$(PRODUCT_LOCALES))" \
@@ -995,7 +995,7 @@ INTERNAL_SYSTEMIMAGE_FILES := $(filter $(TARGET_OUT)/%, \
 
 systemimage-squisher: $(INTERNAL_SYSTEMIMAGE_FILES)
 	@echo -e "Optimizing PNGs to Shrink ROM Size!"
-	$(hide) APKCERTS=$(APKCERTS_FILE) ./vendor/liquid/tools/squisher
+	$(hide) APKCERTS=$(APKCERTS_FILE) ./vendor/infamous/tools/squisher
 
 .PHONY: systemimage-squisher
 
@@ -1629,7 +1629,7 @@ KERNEL_PATH := $(TARGET_KERNEL_SOURCE)/arch/arm/configs/$(TARGET_KERNEL_CONFIG)
 ifeq ($(WITH_GMS),true)
     $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
 else
-ifneq ($(LIQUID_BUILD),)
+ifneq ($(INFAMOUS_BUILD),)
     $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := true
 else
     $(INTERNAL_OTA_PACKAGE_TARGET): backuptool := false
@@ -1642,8 +1642,8 @@ else
     $(INTERNAL_OTA_PACKAGE_TARGET): override_prop := true
 endif
 
-ifneq ($(LIQUID_BUILD),)
-LIQUID_TARGET_PACKAGE := $(PRODUCT_OUT)/$(LIQUID_VERSION)-$(TARGET_PRODUCT).zip
+ifneq ($(INFAMOUS_BUILD),)
+INFAMOUS_TARGET_PACKAGE := $(PRODUCT_OUT)/$(INFAMOUS_VERSION)-$(TARGET_PRODUCT).zip
 endif
 
 ifeq ($(TARGET_OTA_ASSERT_DEVICE),)
@@ -1659,7 +1659,7 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	$(hide) MKBOOTIMG=$(MKBOOTIMG) \
 	   CUSTOM_BOOTING_MK=$(BOARD_CUSTOM_BOOTIMG_MK) \
 	   $(OTA_FROM_TARGET_SCRIPT) -v \
-	   $(if $(LIQUID_BUILD), --block) \
+	   $(if $(INFAMOUS_BUILD), --block) \
 	   -p $(HOST_OUT) \
 	   -k $(KEY_CERT_PAIR) \
 	   $(if $(OEM_OTA_CONFIG), -o $(OEM_OTA_CONFIG)) \
@@ -1667,31 +1667,34 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	   --override_prop=$(override_prop) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
-.PHONY: otapackage liquid bootzip
+.PHONY: otapackage infamous bootzip
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 
-liquid: check_liquid otapackage
-ifneq ($(LIQUID_BUILD),)
-	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(LIQUID_TARGET_PACKAGE)
-	$(hide) $(MD5SUM) $(LIQUID_TARGET_PACKAGE) > $(LIQUID_TARGET_PACKAGE).md5sum
-	@echo -e ${CL_BLU}""${CL_BLU}
-	@echo -e ${CL_BLU}"       __                        _______                      __  __ "${CL_BLU}
-	@echo -e ${CL_BLU}"      / /   __ ___  __  __ _ ___/ / ___/ ___ ____  ___  ___  / /_/ /_ "${CL_BLU}
-	@echo -e ${CL_BLU}"     / /   / / __ '/ / / / / __  /\__  \/ __' __ \/__ \/__ \/ __/ __ \ "${CL_BLU}
-	@echo -e ${CL_BLU}"    / /___/ / /_/ / /_/ / / /_/ /___/  / / / / / //_/ //_/ / /_/ / / / "${CL_BLU}
-	@echo -e ${CL_BLU}"   /_____/_/\__, /\__,_/_/\__,_//____ /_/ /_/ /_/\___/\___/\__/_/ /_/ "${CL_BLU}
-	@echo -e ${CL_BLU}"              /_/       Liquid-Lollipop"${CL_BLU}
-	@echo -e ${CL_BLU}""${CL_BLU}
-	@echo -e ${CL_CYN}"Package Complete: $(LIQUID_TARGET_PACKAGE)"${CL_CYAN}${CL_RST}
+infamous: check_infamous otapackage
+ifneq ($(INFAMOUS_BUILD),)
+	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(INFAMOUS_TARGET_PACKAGE)
+	$(hide) $(MD5SUM) $(INFAMOUS_TARGET_PACKAGE) > $(INFAMOUS_TARGET_PACKAGE).md5sum
+	@echo -e ${CL_BLU}""
+	@echo -e ""
+	@echo -e ${CL_BLU}"▄█    ▄   ▄████  ██   █▀▄▀█ ████▄   ▄      ▄▄▄▄▄   "
+	@echo -e ${CL_BLU}"██     █  █▀   ▀ █ █  █ █ █ █   █    █    █     ▀▄ "
+	@echo -e ${CL_BLU}"██ ██   █ █▀▀    █▄▄█ █ ▄ █ █   █ █   █ ▄  ▀▀▀▀▄   "
+	@echo -e ${CL_BLU}"▐█ █ █  █ █      █  █ █   █ ▀████ █   █  ▀▄▄▄▄▀    "
+	@echo -e ${CL_BLU}" ▐ █  █ █  █        █    █        █▄ ▄█            "
+	@echo -e ${CL_BLU}"   █   ██   ▀      █    ▀          ▀▀▀             "
+	@echo -e ${CL_BLU}"                  ▀                                "
+	@echo -e ${CL_BLU}""
+	@echo -e ""${CL_RST}
+	@echo -e ${CL_CYN}"Package Complete: $(INFAMOUS_TARGET_PACKAGE)"${CL_BLU}
 endif
 
-ifeq ($(LIQUID_CHANGELOG),true)
+ifeq ($(INFAMOUS_CHANGELOG),true)
 # Generate changelog
-	$(hide) ./vendor/liquid/tools/changelog
-	$(hide) mv $(PRODUCT_OUT)/Changelog.txt $(PRODUCT_OUT)/$(LIQUID_VERSION)-$(TARGET_PRODUCT).txt
+	$(hide) ./vendor/infamous/tools/changelog
+	$(hide) mv $(PRODUCT_OUT)/Changelog.txt $(PRODUCT_OUT)/$(INFAMOUS_VERSION)-$(TARGET_PRODUCT).txt
 endif
 
-check_liquid:
+check_infamous:
 ifneq ($(TARGET_CUSTOM_RELEASETOOL),)
         $(error TARGET_CUSTOM_RELEASETOOL is deprecated)
 endif

@@ -70,12 +70,12 @@ function check_product()
         return
     fi
 
-    if (echo -n $1 | grep -q -e "^liquid_") ; then
-       LIQUID_BUILD=$(echo -n $1 | sed -e 's/^liquid_//g')
+    if (echo -n $1 | grep -q -e "^infamous_") ; then
+       INFAMOUS_BUILD=$(echo -n $1 | sed -e 's/^infamous_//g')
     else
-       LIQUID_BUILD=
+       INFAMOUS_BUILD=
     fi
-    export LIQUID_BUILD
+    export INFAMOUS_BUILD
 
         TARGET_PRODUCT=$1 \
         TARGET_BUILD_VARIANT= \
@@ -511,7 +511,7 @@ function brunch()
 {
     breakfast $*
     if [ $? -eq 0 ]; then
-mka liquid
+mka infamous
     else
 echo "No such item in brunch menu. Try 'breakfast'"
         return 1
@@ -534,10 +534,10 @@ function breakfast()
 {
     target=$1
     local variant=$2
-    LIQUID_DEVICES_ONLY="true"
+    INFAMOUS_DEVICES_ONLY="true"
     unset LUNCH_MENU_CHOICES
     add_lunch_combo full-eng
-    for f in `/bin/ls vendor/liquid/vendorsetup.sh 2> /dev/null`
+    for f in `/bin/ls vendor/infamous/vendorsetup.sh 2> /dev/null`
         do
 echo "including $f"
             . $f
@@ -553,11 +553,11 @@ echo "z$target" | grep -q "-"
             # A buildtype was specified, assume a full device name
             lunch $target
         else
-            # This is probably just the LIQUID model name
+            # This is probably just the infamous model name
             if [ -z "$variant" ]; then
                 variant="userdebug"
             fi
-            lunch LIQUID_$target-$variant
+            lunch INFAMOUS_$target-$variant
         fi
 fi
 return $?
@@ -604,7 +604,7 @@ function lunch()
     check_product $product
     if [ $? -ne 0 ]
     then
-        # if we can't find a product, try to grab it off the LiquidSmooth github
+        # if we can't find a product, try to grab it off the Infamous github
         T=$(gettop)
         pushd $T > /dev/null
         build/tools/roomservice.py $product
@@ -767,8 +767,8 @@ alias mmp='mmmp .'
 function eat()
 {
     if [ "$OUT" ] ; then
-        MODVERSION=`sed -n -e'/ro\.liquid\.version/s/.*=//p' $OUT/system/build.prop`
-        ZIPFILE=liquid-$MODVERSION.zip
+        MODVERSION=`sed -n -e'/ro\.infamous\.version/s/.*=//p' $OUT/system/build.prop`
+        ZIPFILE=infamous-$MODVERSION.zip
         ZIPPATH=$OUT/$ZIPFILE
         if [ ! -f $ZIPPATH ] ; then
             echo "Nothing to eat"
